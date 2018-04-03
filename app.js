@@ -14,7 +14,19 @@ app.get('/client/client.js', function(req,res){
 server.listen(8080);
 console.log('Server Started.');
 
+var users = [];
+var rooms = [];
+
 io.on('connection', function(socket){
-	console.log("Connection.");
-	socket.emit("welcome", {message:"Hello!"});
+	console.log('Connection. ID: ' + users.length);
+	socket.id = users.length;
+	users.push(socket);
+	socket.emit('welcome', {message:"Hello!"});
+	socket.on('people', function(){
+		socket.emit('people', {people:users.length});
+	});
+	socket.on('disconnect', function(){
+		users.splice(socket.id);
+		console.log('Disconnection.' + socket.id);
+	});
 });
